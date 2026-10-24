@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fbf8ee" />
+    <meta name="description" content="Цветной пиксельный раннер с героями, выбранными вместе." />
+    <title>Game Challenge — общий забег</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./game.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Game Challenge, начало страницы">
+          <span class="brand-mark" aria-hidden="true">G</span>
+          <span>GAME <span class="brand-light">CHALLENGE</span></span>
+        </a>
+        <span class="build-tag"><span class="live-dot"></span> ТЕСТОВЫЙ ЗАБЕГ</span>
+      </header>
+
+      <section class="intro" id="top">
+        <div class="intro-copy">
+          <p class="eyebrow">ОДИН РАННЕР · ВОСЕМЬ ГЕРОЕВ</p>
+          <h1>Собери героя.<br /><span>Рванём вместе.</span></h1>
+          <p class="intro-lede">Выбери персонажа и проверь, сколько продержишься на трассе.</p>
+        </div>
+        <div class="intro-sticker" aria-hidden="true">
+          <span>★</span>
+          <strong>ТВОЙ<br />ЗАБЕГ!</strong>
+          <i>↗</i>
+        </div>
+      </section>
+
+      <section class="picker-section" aria-labelledby="picker-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">01 / ВЫБЕРИ СВОЕГО БЕГУНА</p>
+            <h2 id="picker-title">Кто стартует?</h2>
+          </div>
+          <p class="selection-note" id="selection-note">Выбери одного героя</p>
+        </div>
+        <div class="character-grid" id="character-grid" aria-label="Персонажи">
+          <div class="loading-card">Готовим команду…</div>
+        </div>
+      </section>
+
+      <section class="game-section" aria-labelledby="game-title">
+        <div class="section-heading game-heading">
+          <div>
+            <p class="eyebrow">02 / ПОРА НА ТРАССУ</p>
+            <h2 id="game-title">Забег начинается</h2>
+          </div>
+          <div class="scoreboard" aria-live="polite">
+            <div class="score-chip"><span>СЧЁТ</span><strong id="score">0000</strong></div>
+            <div class="score-chip best-chip"><span>РЕКОРД</span><strong id="best-score">0000</strong></div>
+          </div>
+        </div>
+
+        <div class="game-frame">
+          <div class="arena" id="arena">
+            <div class="sun" aria-hidden="true"></div>
+            <div class="cloud cloud-one" aria-hidden="true"></div>
+            <div class="cloud cloud-two" aria-hidden="true"></div>
+            <div class="hill hill-back" aria-hidden="true"></div>
+            <div class="hill hill-front" aria-hidden="true"></div>
+            <div class="track-markings" aria-hidden="true"></div>
+
+            <div class="energy-widget">
+              <div class="energy-label"><span>⚡ ЗАПАС СИЛ</span><strong id="energy-value">100%</strong></div>
+              <div class="energy-track"><div class="energy-fill" id="energy-fill"></div></div>
+            </div>
+
+            <div class="runner" id="runner" aria-label="Ваш персонаж">
+              <img id="runner-image" alt="" draggable="false" />
+              <span class="runner-shadow" aria-hidden="true"></span>
+            </div>
+            <div id="objects-layer" class="objects-layer" aria-hidden="true"></div>
+
+            <div class="ground" aria-hidden="true"><span></span></div>
+
+            <div class="arena-overlay" id="start-overlay">
+              <div class="overlay-card">
+                <span class="overlay-icon" aria-hidden="true">🏁</span>
+                <p class="eyebrow">ГОТОВ К СТАРТУ?</p>
+                <h3>Трасса ждёт!</h3>
+                <p>Прыгай через препятствия, пригибайся под навесами и собирай бонусы.</p>
+                <button class="primary-button" id="start-button" type="button" disabled>ЗАПУСТИТЬ ЗАБЕГ <span>→</span></button>
+                <p class="overlay-hint">ПРОБЕЛ или ↑ — прыжок <span>·</span> ↓ — присесть</p>
+              </div>
+            </div>
+
+            <div class="arena-overlay is-hidden" id="game-over-overlay" aria-live="polite">
+              <div class="overlay-card">
+                <span class="overlay-icon" id="result-icon" aria-hidden="true">🏆</span>
+                <p class="eyebrow" id="result-eyebrow">ЗАБЕГ ЗАВЕРШЁН</p>
+                <h3 id="result-title">Крутой забег!</h3>
+                <p id="result-copy">Ты набрал 0 очков.</p>
+                <button class="primary-button" id="restart-button" type="button">ЕЩЁ ОДИН ЗАБЕГ <span>↻</span></button>
+              </div>
+            </div>
+
+            <div class="notice is-hidden" id="notice" role="status"></div>
+          </div>
+          <div class="game-footer">
+            <span><i class="control-dot jump-dot"></i>ПРЫГНИ НАД ПРЕПЯТСТВИЕМ</span>
+            <span><i class="control-dot duck-dot"></i>ПРИСЯДЬ ПОД НИЗКИМ</span>
+            <span><i class="control-dot pickup-dot"></i>ЗАБЕРИ БОНУС</span>
+          </div>
+        </div>
+
+        <div class="touch-controls" aria-label="Управление для сенсорного экрана">
+          <button class="touch-button jump-button" id="jump-button" type="button"><span>↑</span> ПРЫЖОК</button>
+          <button class="touch-button duck-button" id="duck-button" type="button"><span>↓</span> ПРИСЕСТЬ</button>
+        </div>
+      </section>
+
+      <section class="rules-section" aria-label="Правила игры">
+        <article class="rule-card rule-jump">
+          <span class="rule-icon" aria-hidden="true">📚</span>
+          <div><span class="rule-kicker">ПЕРЕПРЫГИВАЙ</span><strong id="jump-rule">Стопки книг и лужи</strong></div>
+        </article>
+        <article class="rule-card rule-duck">
+          <span class="rule-icon" aria-hidden="true">🌿</span>
+          <div><span class="rule-kicker">ПРИГИБАЙСЯ</span><strong id="duck-rule">Низкие ветки</strong></div>
+        </article>
+        <article class="rule-card rule-energy">
+          <span class="rule-icon" aria-hidden="true">🍕</span>
+          <div><span class="rule-kicker">ВОССТАНОВИ СИЛЫ</span><strong>Собирай вкусные бонусы</strong></div>
+        </article>
+        <article class="rule-card rule-growth">
+          <span class="rule-icon" aria-hidden="true">✨</span>
+          <div><span class="rule-kicker">СТАНЬ БОЛЬШЕ</span><strong>Лови значок роста</strong></div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        <span>СОБРАНО ИЗ ИДЕЙ КОМАНДЫ <span aria-hidden="true">✳</span></span>
+        <span>GAME CHALLENGE · TEST BUILD 01</span>
+      </footer>
+    </main>
+  </body>
+</html>
