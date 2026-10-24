@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "description": "Вымышленные тестовые ответы участников; не реальные персональные данные.",
+  "questionnaire_fields": [
+    "gender_presentation",
+    "hair_color",
+    "hairstyle",
+    "eye_color",
+    "shirt_color",
+    "pants_color",
+    "sneaker_color",
+    "jump_over",
+    "duck_under",
+    "energy_pickup",
+    "temporary_growth_pickup"
+  ],
+  "image_requirements": {
+    "style_reference": "крупная контрастная пиксельная графика классического Dino-раннера",
+    "format": "PNG",
+    "canvas_px": [512, 512],
+    "background": "transparent",
+    "view": "вид сбоку, персонаж бежит вправо",
+    "file_pattern": "avatar-{response_id}.png",
+    "one_character_per_file": true,
+    "display_size_px": [50, 50]
+  },
+  "team_image_path": "images/characters/team-photo.png",
+  "mock_answers": [
+    {
+      "response_id": "001",
+      "character": {
+        "gender_presentation": "девочка",
+        "hair_color": "рыжие",
+        "hairstyle": "хвост",
+        "eye_color": "карие",
+        "shirt_color": "бирюзовая",
+        "pants_color": "фиолетовые",
+        "sneaker_color": "фиолетовые",
+        "image_path": "images/characters/avatar-001.png"
+      },
+      "game_ideas": {
+        "jump_over": "лужа",
+        "duck_under": "низкая ветка",
+        "energy_pickup": "кусок пиццы",
+        "temporary_growth_pickup": "волшебные кроссовки"
+      }
+    },
+    {
+      "response_id": "002",
+      "character": {
+        "gender_presentation": "мальчик",
+        "hair_color": "тёмно-коричневые",
+        "hairstyle": "кудрявые короткие",
+        "eye_color": "ореховые",
+        "shirt_color": "оранжевая",
+        "pants_color": "синие",
+        "sneaker_color": "синие",
+        "image_path": "images/characters/avatar-002.png"
+      },
+      "game_ideas": {
+        "jump_over": "стопка учебников",
+        "duck_under": "висящий баннер",
+        "energy_pickup": "апельсин",
+        "temporary_growth_pickup": "звёздный значок"
+      }
+    },
+    {
+      "response_id": "003",
+      "character": {
+        "gender_presentation": "нейтральная внешность",
+        "hair_color": "розовые",
+        "hairstyle": "короткая стрижка",
+        "eye_color": "карие",
+        "shirt_color": "жёлтая",
+        "pants_color": "зелёные",
+        "sneaker_color": "жёлтые",
+        "image_path": "images/characters/avatar-003.png"
+      },
+      "game_ideas": {
+        "jump_over": "рюкзак",
+        "duck_under": "бумажные самолётики",
+        "energy_pickup": "баскетбольный мяч",
+        "temporary_growth_pickup": "волшебные кроссовки"
+      }
+    },
+    {
+      "response_id": "004",
+      "character": {
+        "gender_presentation": "девочка",
+        "hair_color": "чёрные",
+        "hairstyle": "две косички",
+        "eye_color": "карие",
+        "shirt_color": "розовая",
+        "pants_color": "чёрные",
+        "sneaker_color": "розовые",
+        "image_path": "images/characters/avatar-004.png"
+      },
+      "game_ideas": {
+        "jump_over": "лужа",
+        "duck_under": "низкая ветка",
+        "energy_pickup": "кусок пиццы",
+        "temporary_growth_pickup": "огромная звезда"
+      }
+    },
+    {
+      "response_id": "005",
+      "character": {
+        "gender_presentation": "мальчик",
+        "hair_color": "светлые",
+        "hairstyle": "взъерошенные",
+        "eye_color": "голубые",
+        "shirt_color": "красная",
+        "pants_color": "серые",
+        "sneaker_color": "красные",
+        "image_path": "images/characters/avatar-005.png"
+      },
+      "game_ideas": {
+        "jump_over": "стопка учебников",
+        "duck_under": "висящий баннер",
+        "energy_pickup": "банан",
+        "temporary_growth_pickup": "волшебные кроссовки"
+      }
+    },
+    {
+      "response_id": "006",
+      "character": {
+        "gender_presentation": "нейтральная внешность",
+        "hair_color": "голубые",
+        "hairstyle": "короткие прямые",
+        "eye_color": "фиолетовые",
+        "shirt_color": "фиолетовая",
+        "pants_color": "оранжевые",
+        "sneaker_color": "фиолетовые",
+        "image_path": "images/characters/avatar-006.png"
+      },
+      "game_ideas": {
+        "jump_over": "лужа",
+        "duck_under": "бумажные самолётики",
+        "energy_pickup": "баскетбольный мяч",
+        "temporary_growth_pickup": "звёздный значок"
+      }
+    },
+    {
+      "response_id": "007",
+      "character": {
+        "gender_presentation": "девочка",
+        "hair_color": "каштановые",
+        "hairstyle": "каре",
+        "eye_color": "зелёные",
+        "shirt_color": "зелёная",
+        "pants_color": "розовые",
+        "sneaker_color": "розовые",
+        "image_path": "images/characters/avatar-007.png"
+      },
+      "game_ideas": {
+        "jump_over": "рюкзак",
+        "duck_under": "низкая ветка",
+        "energy_pickup": "кусок пиццы",
+        "temporary_growth_pickup": "огромная звезда"
+      }
+    },
+    {
+      "response_id": "008",
+      "character": {
+        "gender_presentation": "мальчик",
+        "hair_color": "серебристые",
+        "hairstyle": "короткие волнистые",
+        "eye_color": "голубые",
+        "shirt_color": "синяя",
+        "pants_color": "жёлтые",
+        "sneaker_color": "синие",
+        "image_path": "images/characters/avatar-008.png"
+      },
+      "game_ideas": {
+        "jump_over": "лужа",
+        "duck_under": "низкая ветка",
+        "energy_pickup": "баскетбольный мяч",
+        "temporary_growth_pickup": "волшебные кроссовки"
+      }
+    }
+  ],
+  "mock_vote_summary": {
+    "jump_over": [
+      { "item": "лужа", "votes": 4 },
+      { "item": "стопка учебников", "votes": 2 },
+      { "item": "рюкзак", "votes": 2 }
+    ],
+    "duck_under": [
+      { "item": "низкая ветка", "votes": 4 },
+      { "item": "висящий баннер", "votes": 2 },
+      { "item": "бумажные самолётики", "votes": 2 }
+    ],
+    "energy_pickup": [
+      { "item": "баскетбольный мяч", "votes": 3 },
+      { "item": "кусок пиццы", "votes": 3 },
+      { "item": "апельсин", "votes": 1 },
+      { "item": "банан", "votes": 1 }
+    ],
+    "temporary_growth_pickup": [
+      { "item": "волшебные кроссовки", "votes": 4 },
+      { "item": "звёздный значок", "votes": 2 },
+      { "item": "огромная звезда", "votes": 2 }
+    ]
+  }
+}
