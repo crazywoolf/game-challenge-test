@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Вымышленные тестовые ответы участников; не реальные персональные данные.",
+  "description": "Игровые образы собраны по сообщениям общего чата; для неполных описаний часть деталей дополнена условно.",
   "questionnaire_fields": [
     "gender_presentation",
     "hair_color",
@@ -17,12 +17,18 @@
   "image_requirements": {
     "style_reference": "крупная контрастная пиксельная графика классического Dino-раннера",
     "format": "PNG",
-    "canvas_px": [512, 512],
+    "canvas_px": [
+      512,
+      512
+    ],
     "background": "transparent",
     "view": "вид сбоку, персонаж бежит вправо",
     "file_pattern": "avatar-{response_id}.png",
     "one_character_per_file": true,
-    "display_size_px": [50, 50]
+    "display_size_px": [
+      50,
+      50
+    ]
   },
   "team_image_path": "images/characters/team-photo.png",
   "mock_answers": [
@@ -180,26 +186,414 @@
     }
   ],
   "mock_vote_summary": {
+    "is_draft": true,
+    "note": "Сводка голосования не загружена. Идеи ниже — добрый черновик по ответам; ведущий может заменить их после голосования.",
     "jump_over": [
-      { "item": "лужа", "votes": 4 },
-      { "item": "стопка учебников", "votes": 2 },
-      { "item": "рюкзак", "votes": 2 }
+      "Стопка школьных заданий",
+      "Кочан капусты"
     ],
     "duck_under": [
-      { "item": "низкая ветка", "votes": 4 },
-      { "item": "висящий баннер", "votes": 2 },
-      { "item": "бумажные самолётики", "votes": 2 }
+      "Длинная инструкция",
+      "Облачко уборки"
     ],
     "energy_pickup": [
-      { "item": "баскетбольный мяч", "votes": 3 },
-      { "item": "кусок пиццы", "votes": 3 },
-      { "item": "апельсин", "votes": 1 },
-      { "item": "банан", "votes": 1 }
+      "Музыкальные ноты",
+      "Книжка",
+      "Футбольный мяч",
+      "Котик",
+      "Кусочек пиццы"
     ],
     "temporary_growth_pickup": [
-      { "item": "волшебные кроссовки", "votes": 4 },
-      { "item": "звёздный значок", "votes": 2 },
-      { "item": "огромная звезда", "votes": 2 }
+      "Солнечный выходной"
     ]
+  },
+  "characters": [
+    {
+      "response_id": "001",
+      "display_name": "52",
+      "appearance": "Внешность не указана; образ условный.",
+      "likes": "Не указано",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/52.png"
+    },
+    {
+      "response_id": "002",
+      "display_name": "Алекс",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Рисовать и побеждать в футболе",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/alex.png"
+    },
+    {
+      "response_id": "003",
+      "display_name": "Алёна",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Гулять и пицца",
+      "dislikes": "Домашнее задание",
+      "image_path": "images/community-characters/alyona.png"
+    },
+    {
+      "response_id": "004",
+      "display_name": "Амелия",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Сладкое",
+      "dislikes": "Учиться",
+      "image_path": "images/community-characters/amelia.png"
+    },
+    {
+      "response_id": "005",
+      "display_name": "Антон",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Большой теннис и быстрый бег",
+      "dislikes": "Долгие инструкции тренера и долго делать уроки",
+      "image_path": "images/community-characters/anton.png"
+    },
+    {
+      "response_id": "006",
+      "display_name": "Валера",
+      "appearance": "Внешность не указана; образ условный.",
+      "likes": "Играть в игры",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/valera.png"
+    },
+    {
+      "response_id": "007",
+      "display_name": "Василиса",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Не указано",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/vasilisa.png"
+    },
+    {
+      "response_id": "008",
+      "display_name": "Вова",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Отпуск",
+      "dislikes": "Работать",
+      "image_path": "images/community-characters/vova.png"
+    },
+    {
+      "response_id": "009",
+      "display_name": "Гоша",
+      "appearance": "Цвет глаз и основная одежда не указаны; добавлены для образа.",
+      "likes": "Давать списывать на контрольной",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/gosha.png"
+    },
+    {
+      "response_id": "010",
+      "display_name": "Дина",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Не указано",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/dina.png"
+    },
+    {
+      "response_id": "011",
+      "display_name": "Ева",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Интернет",
+      "dislikes": "Уроки",
+      "image_path": "images/community-characters/eva.png"
+    },
+    {
+      "response_id": "012",
+      "display_name": "Егор",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Смотреть фильмы",
+      "dislikes": "Слушать классику",
+      "image_path": "images/community-characters/egor.png"
+    },
+    {
+      "response_id": "013",
+      "display_name": "Злата",
+      "appearance": "Вариант Дмитрия: очки, серая футболка, шорты.",
+      "likes": "Игры на телефоне",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/zlata-dmitry.png"
+    },
+    {
+      "response_id": "014",
+      "display_name": "Злата",
+      "appearance": "Вариант Татьяны: красная толстовка и джинсы.",
+      "likes": "Футбол и пицца",
+      "dislikes": "Уборка и рыба",
+      "image_path": "images/community-characters/zlata-tatyana.png"
+    },
+    {
+      "response_id": "015",
+      "display_name": "Йцукен",
+      "appearance": "Внешность почти не указана; образ условный.",
+      "likes": "Есть",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/yutsuken.png"
+    },
+    {
+      "response_id": "016",
+      "display_name": "Кайро",
+      "appearance": "Одежда не указана; добавлена для образа.",
+      "likes": "Слушать музыку",
+      "dislikes": "Носить синие носки",
+      "image_path": "images/community-characters/kairo.png"
+    },
+    {
+      "response_id": "017",
+      "display_name": "Кир",
+      "appearance": "Вариант Виктории: тёмные волосы, зелёная кофта.",
+      "likes": "Пицца",
+      "dislikes": "Капуста",
+      "image_path": "images/community-characters/kir-victoria.png"
+    },
+    {
+      "response_id": "018",
+      "display_name": "Кир",
+      "appearance": "Отдельный вариант: зелёные волосы, чёрная кофта, джинсы.",
+      "likes": "Brawl Stars и Minecraft",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/kir-greenhair.png"
+    },
+    {
+      "response_id": "019",
+      "display_name": "Кира",
+      "appearance": "Внешность не указана; образ условный.",
+      "likes": "Рисовать и Roblox",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/kira.png"
+    },
+    {
+      "response_id": "020",
+      "display_name": "Кристи",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Общаться с подругой и купаться",
+      "dislikes": "Английский",
+      "image_path": "images/community-characters/kristi.png"
+    },
+    {
+      "response_id": "021",
+      "display_name": "Лера",
+      "appearance": "Вариант спортсменки на роликах.",
+      "likes": "Кататься на роликах",
+      "dislikes": "Биология и домашнее задание",
+      "image_path": "images/community-characters/lera-skater.png"
+    },
+    {
+      "response_id": "022",
+      "display_name": "Лера",
+      "appearance": "Вариант любительницы рока и метала; внешность не указана.",
+      "likes": "Не указано",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/lera-rock.png"
+    },
+    {
+      "response_id": "023",
+      "display_name": "Лия",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Читать и танцевать",
+      "dislikes": "Уроки",
+      "image_path": "images/community-characters/lia.png"
+    },
+    {
+      "response_id": "024",
+      "display_name": "Настя",
+      "appearance": "Одежда указана; причёска не указана.",
+      "likes": "Вкусный лимонад и вкусности",
+      "dislikes": "Убираться дома",
+      "image_path": "images/community-characters/nastya.png"
+    },
+    {
+      "response_id": "025",
+      "display_name": "Неон",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Вкусно есть и играть в компьютерные игры",
+      "dislikes": "Уроки",
+      "image_path": "images/community-characters/neon.png"
+    },
+    {
+      "response_id": "026",
+      "display_name": "Ника",
+      "appearance": "Объединены повторные сообщения Нади; в раннем сообщении указано только имя.",
+      "likes": "Гулять и рисовать",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/nika.png"
+    },
+    {
+      "response_id": "027",
+      "display_name": "Николь",
+      "appearance": "Одежда не указана; добавлена для образа.",
+      "likes": "Рисовать и котики",
+      "dislikes": "Футбол",
+      "image_path": "images/community-characters/nicole.png"
+    },
+    {
+      "response_id": "028",
+      "display_name": "Оля Стар",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Художественная гимнастика и чтение",
+      "dislikes": "Убираться",
+      "image_path": "images/community-characters/olya.png"
+    },
+    {
+      "response_id": "029",
+      "display_name": "Радуга",
+      "appearance": "Указано только имя; образ условный.",
+      "likes": "Не указано",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/raduga.png"
+    },
+    {
+      "response_id": "030",
+      "display_name": "Рак",
+      "appearance": "Одежда не указана; добавлена для образа.",
+      "likes": "Солнце",
+      "dislikes": "Скукота",
+      "image_path": "images/community-characters/rak.png"
+    },
+    {
+      "response_id": "031",
+      "display_name": "Рая",
+      "appearance": "Указано только имя; образ условный.",
+      "likes": "Читать",
+      "dislikes": "Английский",
+      "image_path": "images/community-characters/raya.png"
+    },
+    {
+      "response_id": "032",
+      "display_name": "Рэйчел",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Всё, чем занимается; друзья и музыка",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/rachel.png"
+    },
+    {
+      "response_id": "033",
+      "display_name": "Сандра",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Рисовать; лавандовый цвет",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/sandra.png"
+    },
+    {
+      "response_id": "034",
+      "display_name": "Соня",
+      "appearance": "Внешность не указана; образ условный.",
+      "likes": "Зелёный цвет",
+      "dislikes": "Учиться",
+      "image_path": "images/community-characters/sonya-platon.png"
+    },
+    {
+      "response_id": "035",
+      "display_name": "Соня",
+      "appearance": "Отдельное описание Софии: длинные тёмные волосы, зелёные глаза.",
+      "likes": "Каникулы",
+      "dislikes": "Уроки",
+      "image_path": "images/community-characters/sonya-sophia.png"
+    },
+    {
+      "response_id": "036",
+      "display_name": "Сукуна",
+      "appearance": "Самостоятельный оригинальный образ по описанию участницы.",
+      "likes": "Рыбалка",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/sukuna.png"
+    },
+    {
+      "response_id": "037",
+      "display_name": "Танкист",
+      "appearance": "Имя не указано; использована подпись «Игрок в танки».",
+      "likes": "Играть в Tanks Blitz",
+      "dislikes": "Рикошеты",
+      "image_path": "images/community-characters/tank-player.png"
+    },
+    {
+      "response_id": "038",
+      "display_name": "Шуа",
+      "appearance": "Пиксельный игровой персонаж по описанию участника.",
+      "likes": "Смотреть фильмы и читать",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/shua.png"
+    },
+    {
+      "response_id": "039",
+      "display_name": "Чебурашка",
+      "appearance": "Оригинальная девочка по описанию, не персонаж мультфильма.",
+      "likes": "Музыка",
+      "dislikes": "Чтение",
+      "image_path": "images/community-characters/cheburashka.png"
+    },
+    {
+      "response_id": "040",
+      "display_name": "Ян",
+      "appearance": "Повторные сообщения объединены.",
+      "likes": "Манга, аниме и свои игры",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/yan.png"
+    },
+    {
+      "response_id": "041",
+      "display_name": "Ярик",
+      "appearance": "Одежда и причёска не указаны; добавлены для образа.",
+      "likes": "Играть в Brawl Stars; число 67",
+      "dislikes": "Не указано",
+      "image_path": "images/community-characters/yarik.png"
+    }
+  ],
+  "game_item_art": {
+    "collectibles": {
+      "Brawl Stars и Minecraft": "images/game-items/collectibles/collectible-001.png",
+      "Большой теннис и быстрый бег": "images/game-items/collectibles/collectible-002.png",
+      "Вкусно есть и играть в компьютерные игры": "images/game-items/collectibles/collectible-003.png",
+      "Вкусный лимонад и вкусности": "images/game-items/collectibles/collectible-004.png",
+      "Всё, чем занимается; друзья и музыка": "images/game-items/collectibles/collectible-005.png",
+      "Гулять и пицца": "images/game-items/collectibles/collectible-006.png",
+      "Гулять и рисовать": "images/game-items/collectibles/collectible-007.png",
+      "Давать списывать на контрольной": "images/game-items/collectibles/collectible-008.png",
+      "Есть": "images/game-items/collectibles/collectible-009.png",
+      "Зелёный цвет": "images/game-items/collectibles/collectible-010.png",
+      "Играть в Brawl Stars; число 67": "images/game-items/collectibles/collectible-011.png",
+      "Играть в Tanks Blitz": "images/game-items/collectibles/collectible-012.png",
+      "Играть в игры": "images/game-items/collectibles/collectible-013.png",
+      "Игры на телефоне": "images/game-items/collectibles/collectible-014.png",
+      "Интернет": "images/game-items/collectibles/collectible-015.png",
+      "Каникулы": "images/game-items/collectibles/collectible-016.png",
+      "Кататься на роликах": "images/game-items/collectibles/collectible-017.png",
+      "Манга, аниме и свои игры": "images/game-items/collectibles/collectible-018.png",
+      "Музыка": "images/game-items/collectibles/collectible-019.png",
+      "Общаться с подругой и купаться": "images/game-items/collectibles/collectible-020.png",
+      "Отпуск": "images/game-items/collectibles/collectible-021.png",
+      "Пицца": "images/game-items/collectibles/collectible-022.png",
+      "Рисовать и Roblox": "images/game-items/collectibles/collectible-023.png",
+      "Рисовать и котики": "images/game-items/collectibles/collectible-024.png",
+      "Рисовать и побеждать в футболе": "images/game-items/collectibles/collectible-025.png",
+      "Рисовать; лавандовый цвет": "images/game-items/collectibles/collectible-026.png",
+      "Рыбалка": "images/game-items/collectibles/collectible-027.png",
+      "Сладкое": "images/game-items/collectibles/collectible-028.png",
+      "Слушать музыку": "images/game-items/collectibles/collectible-029.png",
+      "Смотреть фильмы": "images/game-items/collectibles/collectible-030.png",
+      "Смотреть фильмы и читать": "images/game-items/collectibles/collectible-031.png",
+      "Солнце": "images/game-items/collectibles/collectible-032.png",
+      "Футбол и пицца": "images/game-items/collectibles/collectible-033.png",
+      "Художественная гимнастика и чтение": "images/game-items/collectibles/collectible-034.png",
+      "Читать": "images/game-items/collectibles/collectible-035.png",
+      "Читать и танцевать": "images/game-items/collectibles/collectible-036.png"
+    },
+    "obstacles": {
+      "Английский": "images/game-items/obstacles/obstacle-001.png",
+      "Биология и домашнее задание": "images/game-items/obstacles/obstacle-002.png",
+      "Долгие инструкции тренера и долго делать уроки": "images/game-items/obstacles/obstacle-003.png",
+      "Домашнее задание": "images/game-items/obstacles/obstacle-004.png",
+      "Капуста": "images/game-items/obstacles/obstacle-005.png",
+      "Носить синие носки": "images/game-items/obstacles/obstacle-006.png",
+      "Работать": "images/game-items/obstacles/obstacle-007.png",
+      "Рикошеты": "images/game-items/obstacles/obstacle-008.png",
+      "Скукота": "images/game-items/obstacles/obstacle-009.png",
+      "Слушать классику": "images/game-items/obstacles/obstacle-010.png",
+      "Убираться": "images/game-items/obstacles/obstacle-011.png",
+      "Убираться дома": "images/game-items/obstacles/obstacle-012.png",
+      "Уборка и рыба": "images/game-items/obstacles/obstacle-013.png",
+      "Уроки": "images/game-items/obstacles/obstacle-014.png",
+      "Учиться": "images/game-items/obstacles/obstacle-015.png",
+      "Футбол": "images/game-items/obstacles/obstacle-016.png",
+      "Чтение": "images/game-items/obstacles/obstacle-017.png"
+    }
   }
 }

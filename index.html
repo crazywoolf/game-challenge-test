@@ -48,6 +48,15 @@
     #energyValue { color: #d98625; }
     .canvas-wrap { position: relative; overflow: hidden; border: 2px solid #d7e4e9; border-radius: 17px; background: #bde7ff; }
     #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 8 / 3; }
+    .background-picker { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; margin: 0 0 11px; padding: 0; border: 0; }
+    .background-picker legend { float: left; width: max-content; margin: 0; padding: 0; color: var(--muted); font-size: 11px; font-weight: 900; }
+    .background-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+    .background-choice { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 8px; border: 1px solid #e8e2d5; border-radius: 11px; background: #fff; color: #526176; cursor: pointer; font-size: 11px; font-weight: 900; transition: border-color .12s, background .12s, transform .12s; }
+    .background-choice:hover { transform: translateY(-1px); border-color: #b9cbd4; }
+    .background-choice:has(input:checked) { border-color: #467d9c; background: #edf8ff; color: #234b63; box-shadow: 0 2px 0 #c9e4f1; }
+    .background-choice input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .background-choice:has(input:focus-visible) { outline: 3px solid #376cb0; outline-offset: 2px; }
+    .background-choice span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .game-overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; background: rgba(255, 250, 235, .82); backdrop-filter: blur(3px); }
     .game-overlay[hidden] { display: none; }
     .overlay-box { max-width: 440px; }
@@ -119,6 +128,8 @@
       .stat span { font-size: 9px; }
       .controls-row { align-items: flex-start; }
       .keys-hint { font-size: 10px; }
+      .background-picker { grid-template-columns: 1fr; gap: 6px; }
+      .background-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .mobile-controls { display: flex; }
       .side { grid-template-columns: 1fr; gap: 12px; }
       .panel { padding: 12px; }
@@ -148,6 +159,15 @@
             <div class="stat"><span>Энергия</span><strong id="energyValue">💛 60</strong></div>
           </div>
         </div>
+        <fieldset class="background-picker" aria-label="Выбор фона забега">
+          <legend>Фон забега</legend>
+          <div class="background-options">
+            <label class="background-choice"><input type="radio" name="background" value="meadow" checked><span>🌼 Луг</span></label>
+            <label class="background-choice"><input type="radio" name="background" value="city"><span>🏙️ Город</span></label>
+            <label class="background-choice"><input type="radio" name="background" value="snow"><span>❄️ Снег</span></label>
+            <label class="background-choice"><input type="radio" name="background" value="space"><span>🌙 Космос</span></label>
+          </div>
+        </fieldset>
         <div class="canvas-wrap">
           <canvas id="gameCanvas" width="960" height="360" aria-label="Раннер: перепрыгивай предметы, пригибайся под препятствиями и собирай бонусы"></canvas>
           <div class="game-overlay" id="gameOverlay">
@@ -171,7 +191,7 @@
 
       <aside class="side">
         <section class="card panel" aria-labelledby="rosterTitle">
-          <div class="panel-title"><h2 id="rosterTitle">Выбери героя</h2><span class="count" id="characterCount">28</span></div>
+          <div class="panel-title"><h2 id="rosterTitle">Выбери героя</h2><span class="count" id="characterCount">41</span></div>
           <div class="profile-card" aria-live="polite">
             <div class="profile-heading"><h3 id="profileName">Гоша</h3><span id="profileId">Герой 01</span></div>
             <div class="trait-grid">
@@ -181,7 +201,7 @@
             <p class="profile-feature" id="profileFeature" hidden></p>
           </div>
           <div class="roster" id="roster" aria-label="Галерея героев"></div>
-          <p class="notice" id="dataNotice" hidden>Не удалось загрузить файл данных. Игра запущена с тестовым набором героев.</p>
+          <p class="notice" id="dataNotice" hidden>Файл с анкетами не загрузился; показан встроенный список героев.</p>
         </section>
 
         <section class="card idea-card" aria-labelledby="ideasTitle">
@@ -191,9 +211,11 @@
         </section>
       </aside>
     </div>
-    <p class="footer">Игровые образы вымышленные. Имена и личные истории участников не используются.</p>
+    <p class="footer">Игровые образы созданы по идеям из общего чата. Выбери героя перед забегом.</p>
   </main>
 
+  <script src="./community-character-data.js"></script>
+  <script src="./game-item-art.js"></script>
   <script>
     (() => {
       const canvas = document.getElementById('gameCanvas');
@@ -206,9 +228,12 @@
       const energyValue = document.getElementById('energyValue');
       const spriteSheet = new Image();
       spriteSheet.src = './images/characters/roster.png';
+      let cleanSprites = [];
+      const characterSprites = new Map();
+      const itemSprites = new Map();
 
       const fallbackNames = ['Гоша', 'Сукуна', 'Рая', 'Рак', 'Соня', 'Лия', 'Кристи', 'Алекс', 'Николь', 'Чебурашка', 'Ева', 'Кир', 'Егор', 'Неон', 'Рэйчел', 'Соня', 'Кайро', 'Сандра', 'Лера', 'Дина', 'Антон', 'Вова', 'Василиса', 'Кира', 'Валера', 'Настя', 'Оля Стар'];
-      const fallbackCharacters = fallbackNames.map((name, index) => ({
+      const fallbackCharacters = window.communityCharacters?.length ? window.communityCharacters : fallbackNames.map((name, index) => ({
         response_id: String(index + 1).padStart(3, '0'),
         display_name: name,
         sprite_index: index,
@@ -236,6 +261,7 @@
       let spawnIn = 1.3;
       let objects = [];
       let clouds = [{ x: 100, y: 54, s: 1 }, { x: 430, y: 94, s: .75 }, { x: 770, y: 48, s: 1.1 }];
+      let backgroundTheme = 'meadow';
       let jumpHeight = 0;
       let jumpVelocity = 0;
       let ducking = false;
@@ -260,6 +286,25 @@
       };
 
       function drawCell(target, index, x, y, width, height) {
+        const character = characters[index];
+        if (character?.image_path) {
+          let sprite = characterSprites.get(character.image_path);
+          if (!sprite) {
+            sprite = new Image();
+            characterSprites.set(character.image_path, sprite);
+            sprite.addEventListener('load', () => { drawRoster(); paint(); }, { once: true });
+            sprite.src = `./${character.image_path}`;
+          }
+          if (sprite.complete && sprite.naturalWidth) {
+            target.imageSmoothingEnabled = false;
+            target.drawImage(sprite, x, y, width, height);
+            return;
+          }
+        }
+        if (cleanSprites[index]) {
+          target.drawImage(cleanSprites[index], x, y, width, height);
+          return;
+        }
         if (!spriteSheet.complete || !spriteSheet.naturalWidth) {
           target.fillStyle = ['#d9efff', '#ffe7cf', '#dff4d7', '#f9dce4'][index % 4];
           target.fillRect(x, y, width, height);
@@ -277,6 +322,47 @@
         target.drawImage(spriteSheet, col * cellW, row * cellH, cellW, cellH, x, y, width, height);
       }
 
+      function prepareCharacterCutouts() {
+        const cellW = spriteSheet.naturalWidth / 4;
+        const cellH = spriteSheet.naturalHeight / 7;
+        const width = Math.ceil(cellW);
+        const height = Math.ceil(cellH);
+        const seeds = [[16, 16], [width - 17, 16], [16, height - 17], [width - 17, height - 17]];
+        cleanSprites = Array.from({ length: 28 }, (_, index) => {
+          const cutout = document.createElement('canvas');
+          cutout.width = width; cutout.height = height;
+          const cut = cutout.getContext('2d', { willReadFrequently: true });
+          cut.drawImage(spriteSheet, (index % 4) * cellW, Math.floor(index / 4) * cellH, cellW, cellH, 0, 0, width, height);
+          const image = cut.getImageData(0, 0, width, height);
+          const pixels = image.data;
+          const visited = new Uint8Array(width * height);
+          const queue = new Int32Array(width * height);
+          for (const [seedX, seedY] of seeds) {
+            const seedIndex = seedY * width + seedX;
+            if (visited[seedIndex] || pixels[seedIndex * 4 + 3] < 8) continue;
+            const base = seedIndex * 4;
+            const red = pixels[base], green = pixels[base + 1], blue = pixels[base + 2];
+            let head = 0, tail = 0;
+            queue[tail++] = seedIndex;
+            visited[seedIndex] = 1;
+            while (head < tail) {
+              const point = queue[head++];
+              const offset = point * 4;
+              const similar = Math.abs(pixels[offset] - red) <= 28 && Math.abs(pixels[offset + 1] - green) <= 28 && Math.abs(pixels[offset + 2] - blue) <= 28;
+              if (!similar) continue;
+              pixels[offset + 3] = 0;
+              const x = point % width;
+              if (x > 0 && !visited[point - 1]) { visited[point - 1] = 1; queue[tail++] = point - 1; }
+              if (x + 1 < width && !visited[point + 1]) { visited[point + 1] = 1; queue[tail++] = point + 1; }
+              if (point >= width && !visited[point - width]) { visited[point - width] = 1; queue[tail++] = point - width; }
+              if (point + width < width * height && !visited[point + width]) { visited[point + width] = 1; queue[tail++] = point + width; }
+            }
+          }
+          cut.putImageData(image, 0, 0);
+          return cutout;
+        });
+      }
+
       function drawRoster() {
         rosterEl.replaceChildren();
         characters.forEach((character, index) => {
@@ -289,7 +375,7 @@
           preview.width = 100;
           preview.height = 100;
           preview.setAttribute('aria-hidden', 'true');
-          drawCell(preview.getContext('2d'), Number(character.sprite_index) || 0, 0, 0, 100, 100);
+          drawCell(preview.getContext('2d'), index, 0, 0, 100, 100);
           const name = document.createElement('span');
           name.textContent = character.display_name || `Герой ${index + 1}`;
           const id = document.createElement('small');
@@ -363,40 +449,83 @@
       }
 
       function drawBackground(dt) {
+        const palettes = {
+          meadow: ['#9cdbff', '#e4f5ff', '#f6f4db'],
+          city: ['#f5a96f', '#ffe0a6', '#f6e6cf'],
+          snow: ['#8fc7ed', '#d6efff', '#f5fbff'],
+          space: ['#101934', '#292b58', '#574477']
+        };
         const sky = ctx.createLinearGradient(0, 0, 0, H);
-        sky.addColorStop(0, '#9cdbff');
-        sky.addColorStop(.68, '#e4f5ff');
-        sky.addColorStop(1, '#f6f4db');
+        const colors = palettes[backgroundTheme] || palettes.meadow;
+        sky.addColorStop(0, colors[0]);
+        sky.addColorStop(.68, colors[1]);
+        sky.addColorStop(1, colors[2]);
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, W, H);
-        ctx.fillStyle = '#ffe27a';
-        ctx.beginPath();
-        ctx.arc(815, 78, 35, 0, Math.PI * 2);
-        ctx.fill();
-        clouds.forEach(cloud => {
-          if (state === 'running') cloud.x -= dt * (18 + cloud.s * 10);
-          if (cloud.x < -70) cloud.x = W + 45;
-          drawCloud(cloud.x, cloud.y, cloud.s);
-        });
-        ctx.fillStyle = '#b6e6bf';
-        ctx.beginPath();
-        ctx.moveTo(0, 240);
-        for (let x = 0; x <= W; x += 80) ctx.quadraticCurveTo(x + 35, 195 + Math.sin(x * .016 + elapsed) * 11, x + 80, 240);
-        ctx.lineTo(W, groundY + 18); ctx.lineTo(0, groundY + 18); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#8bcf9d';
-        ctx.fillRect(0, groundY, W, H - groundY);
-        ctx.fillStyle = '#6fb880';
-        ctx.fillRect(0, groundY, W, 9);
-        for (let x = -((elapsed * 150) % 65); x < W; x += 65) {
-          ctx.fillStyle = 'rgba(255,255,255,.36)';
-          ctx.fillRect(x, groundY + 28, 34, 4);
-          ctx.fillRect(x + 24, groundY + 54, 19, 3);
-        }
-        // Small flowers add landmarks without distracting from the run.
-        for (let x = 34; x < W; x += 112) {
-          const fx = (x - (elapsed * 90) % 112 + 112) % W;
-          ctx.fillStyle = '#fff5b8'; ctx.beginPath(); ctx.arc(fx, groundY + 82, 4, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#ef8290'; ctx.beginPath(); ctx.arc(fx + 5, groundY + 92, 3, 0, Math.PI * 2); ctx.fill();
+        if (backgroundTheme === 'meadow') {
+          ctx.fillStyle = '#ffe27a'; ctx.beginPath(); ctx.arc(815, 78, 35, 0, Math.PI * 2); ctx.fill();
+          clouds.forEach(cloud => {
+            if (state === 'running') cloud.x -= dt * (18 + cloud.s * 10);
+            if (cloud.x < -70) cloud.x = W + 45;
+            drawCloud(cloud.x, cloud.y, cloud.s);
+          });
+          ctx.fillStyle = '#b6e6bf'; ctx.beginPath(); ctx.moveTo(0, 240);
+          for (let x = 0; x <= W; x += 80) ctx.quadraticCurveTo(x + 35, 195 + Math.sin(x * .016 + elapsed) * 11, x + 80, 240);
+          ctx.lineTo(W, groundY + 18); ctx.lineTo(0, groundY + 18); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#8bcf9d'; ctx.fillRect(0, groundY, W, H - groundY);
+          ctx.fillStyle = '#6fb880'; ctx.fillRect(0, groundY, W, 9);
+          for (let x = -((elapsed * 150) % 65); x < W; x += 65) {
+            ctx.fillStyle = 'rgba(255,255,255,.36)'; ctx.fillRect(x, groundY + 28, 34, 4); ctx.fillRect(x + 24, groundY + 54, 19, 3);
+          }
+          for (let x = 34; x < W; x += 112) {
+            const fx = (x - (elapsed * 90) % 112 + 112) % W;
+            ctx.fillStyle = '#fff5b8'; ctx.beginPath(); ctx.arc(fx, groundY + 82, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ef8290'; ctx.beginPath(); ctx.arc(fx + 5, groundY + 92, 3, 0, Math.PI * 2); ctx.fill();
+          }
+        } else if (backgroundTheme === 'city') {
+          ctx.fillStyle = '#ffcf79'; ctx.beginPath(); ctx.arc(780, 76, 32, 0, Math.PI * 2); ctx.fill();
+          for (let i = 0; i < 13; i++) {
+            const width = 48 + (i % 3) * 11;
+            const x = i * 82 - ((elapsed * 24) % 82);
+            const height = 48 + ((i * 37) % 92);
+            ctx.fillStyle = i % 2 ? '#b98ca0' : '#8d809d'; ctx.fillRect(x, groundY - height, width, height + 20);
+            ctx.fillStyle = 'rgba(255,232,174,.78)';
+            for (let wy = groundY - height + 13; wy < groundY - 4; wy += 19) for (let wx = x + 11; wx < x + width - 7; wx += 19) ctx.fillRect(wx, wy, 7, 9);
+          }
+          ctx.fillStyle = '#727486'; ctx.fillRect(0, groundY, W, H - groundY);
+          ctx.fillStyle = '#f0c77b'; ctx.fillRect(0, groundY, W, 8);
+          ctx.fillStyle = 'rgba(255,255,255,.7)';
+          for (let x = -((elapsed * 190) % 110); x < W; x += 110) ctx.fillRect(x, groundY + 52, 58, 5);
+        } else if (backgroundTheme === 'snow') {
+          ctx.fillStyle = '#fff1a6'; ctx.beginPath(); ctx.arc(808, 72, 29, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#c4e5f4'; ctx.beginPath(); ctx.moveTo(0, 242);
+          for (let x = 0; x <= W; x += 120) { ctx.lineTo(x + 60, 150 + (x % 3) * 8); ctx.lineTo(x + 120, 242); }
+          ctx.lineTo(W, groundY + 12); ctx.lineTo(0, groundY + 12); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#f7fcff'; ctx.beginPath(); ctx.moveTo(0, 251);
+          for (let x = 0; x <= W; x += 120) { ctx.lineTo(x + 60, 170 + (x % 3) * 8); ctx.lineTo(x + 120, 251); }
+          ctx.lineTo(W, groundY + 12); ctx.lineTo(0, groundY + 12); ctx.closePath(); ctx.fill();
+          for (let i = 0; i < 18; i++) {
+            const x = (i * 71 + 29) % W; const y = 34 + (i * 43) % 180;
+            ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.beginPath(); ctx.arc(x, y + Math.sin(elapsed * 2 + i) * 3, 2 + i % 2, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.fillStyle = '#f5fbff'; ctx.fillRect(0, groundY, W, H - groundY);
+          ctx.fillStyle = '#b7dfea'; ctx.fillRect(0, groundY, W, 8);
+        } else {
+          for (let i = 0; i < 65; i++) {
+            const x = (i * 137) % W; const y = (i * 59) % 220;
+            ctx.globalAlpha = .45 + (Math.sin(elapsed * 2 + i) + 1) * .25;
+            ctx.fillStyle = '#fff7ce'; ctx.beginPath(); ctx.arc(x, y, i % 7 === 0 ? 2 : 1, 0, Math.PI * 2); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = '#f7d897'; ctx.beginPath(); ctx.arc(804, 82, 34, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#d6bb8c'; ctx.beginPath(); ctx.arc(793, 72, 8, 0, Math.PI * 2); ctx.arc(820, 91, 6, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#48416e'; ctx.beginPath(); ctx.moveTo(0, 260);
+          for (let x = 0; x <= W; x += 100) ctx.quadraticCurveTo(x + 50, 222 + Math.sin(x * .02) * 9, x + 100, 260);
+          ctx.lineTo(W, groundY + 12); ctx.lineTo(0, groundY + 12); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#625277'; ctx.fillRect(0, groundY, W, H - groundY);
+          ctx.fillStyle = '#d0a9e8'; ctx.fillRect(0, groundY, W, 8);
+          ctx.fillStyle = 'rgba(224,205,246,.45)';
+          for (let x = -((elapsed * 130) % 95); x < W; x += 95) { ctx.beginPath(); ctx.ellipse(x, groundY + 38, 12, 4, 0, 0, Math.PI * 2); ctx.fill(); }
         }
       }
 
@@ -410,7 +539,7 @@
         ctx.save();
         if (now < flashUntil) ctx.globalAlpha = .48 + Math.sin(now / 40) * .3;
         // The generated roster is a sheet of seven rows and four columns.
-        drawCell(ctx, Number(characters[selectedIndex]?.sprite_index) || selectedIndex, playerX, y, width, height);
+        drawCell(ctx, selectedIndex, playerX, y, width, height);
         if (activeGrowth) {
           ctx.font = '24px sans-serif'; ctx.textAlign = 'center';
           ctx.fillText('✨', playerX + width / 2, y - 4);
@@ -421,27 +550,57 @@
       function drawObject(object) {
         ctx.save();
         if (object.kind === 'jump_over') {
-          const emoji = object.label.includes('капуст') ? '🥬' : '📚';
-          ctx.font = '35px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(emoji, object.x + 23, groundY - 22);
-          roundedRect(object.x + 1, groundY - 5, 44, 6, 3, '#745a43');
+          const sprite = loadItemSprite(object);
+          if (sprite?.complete && sprite.naturalWidth) {
+            ctx.drawImage(sprite, object.x - 3, groundY - 54, 54, 54);
+          } else {
+            const emoji = object.label.includes('капуст') ? '🥬' : '📚';
+            ctx.font = '35px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(emoji, object.x + 23, groundY - 22);
+            roundedRect(object.x + 1, groundY - 5, 44, 6, 3, '#745a43');
+          }
         } else if (object.kind === 'duck_under') {
-          ctx.strokeStyle = '#8f744f'; ctx.lineWidth = 6; ctx.lineCap = 'round';
-          ctx.beginPath(); ctx.moveTo(object.x + 8, groundY - 118); ctx.lineTo(object.x + 8, groundY - 82); ctx.moveTo(object.x + 44, groundY - 118); ctx.lineTo(object.x + 44, groundY - 82); ctx.stroke();
-          roundedRect(object.x, groundY - 126, 58, 35, 10, '#ffad68');
-          ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText(object.label.includes('инструкц') ? '📣' : '🧹', object.x + 29, groundY - 109);
+          const sprite = loadItemSprite(object);
+          if (sprite?.complete && sprite.naturalWidth) {
+            ctx.drawImage(sprite, object.x + 2, groundY - 132, 50, 50);
+          } else {
+            ctx.strokeStyle = '#8f744f'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(object.x + 8, groundY - 118); ctx.lineTo(object.x + 8, groundY - 82); ctx.moveTo(object.x + 44, groundY - 118); ctx.lineTo(object.x + 44, groundY - 82); ctx.stroke();
+            roundedRect(object.x, groundY - 126, 58, 35, 10, '#ffad68');
+            ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(object.label.includes('инструкц') ? '📣' : '🧹', object.x + 29, groundY - 109);
+          }
         } else {
-          const emoji = object.kind === 'temporary_growth_pickup' ? '☀️' : object.emoji;
           ctx.save();
-          ctx.translate(object.x + 20, object.y + Math.sin(elapsed * 6 + object.x) * 4);
-          ctx.rotate(Math.sin(elapsed * 3 + object.x) * .1);
-          ctx.beginPath(); ctx.arc(0, 0, object.kind === 'temporary_growth_pickup' ? 24 : 21, 0, Math.PI * 2);
-          ctx.fillStyle = object.kind === 'temporary_growth_pickup' ? '#ffe680' : '#fff1a6'; ctx.fill();
-          ctx.font = '25px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(emoji, 0, 1);
+          const centerX = object.x + 22;
+          const centerY = object.y;
+          ctx.translate(centerX, centerY);
+          const pulse = 1 + Math.sin(elapsed * 2.4) * .06;
+          ctx.scale(pulse, pulse);
+          const sprite = loadItemSprite(object);
+          if (sprite?.complete && sprite.naturalWidth) {
+            ctx.drawImage(sprite, -24, -24, 48, 48);
+          } else {
+            const emoji = object.kind === 'temporary_growth_pickup' ? '☀️' : object.emoji;
+            ctx.beginPath(); ctx.arc(0, 0, object.kind === 'temporary_growth_pickup' ? 24 : 21, 0, Math.PI * 2);
+            ctx.fillStyle = object.kind === 'temporary_growth_pickup' ? '#ffe680' : '#fff1a6'; ctx.fill();
+            ctx.font = '25px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(emoji, 0, 1);
+          }
           ctx.restore();
         }
         ctx.restore();
+      }
+
+      function loadItemSprite(object) {
+        if (!object.image_path) return null;
+        let sprite = itemSprites.get(object.image_path);
+        if (!sprite) {
+          sprite = new Image();
+          itemSprites.set(object.image_path, sprite);
+          sprite.addEventListener('load', () => paint(), { once: true });
+          sprite.src = `./${object.image_path}`;
+        }
+        return sprite;
       }
 
       function paint(now = performance.now(), dt = 0) {
@@ -470,12 +629,12 @@
         requestAnimationFrame(loop);
       }
 
-      function endRun() {
+      function endRun(message = 'Отличная попытка!') {
         state = 'over';
         overlay.hidden = false;
         document.getElementById('overlayEmoji').textContent = '🌟';
-        document.getElementById('overlayTitle').textContent = 'Отличный забег!';
-        document.getElementById('overlayText').textContent = `Счёт: ${Math.floor(score)}. Команда собрала много хорошего настроения — можно попробовать ещё раз.`;
+        document.getElementById('overlayTitle').textContent = 'Забег завершён';
+        document.getElementById('overlayText').textContent = `${message} Счёт: ${Math.floor(score)}. Можно попробовать ещё раз.`;
         startButton.textContent = 'Сыграть снова';
         restartButton.hidden = false;
         paint();
@@ -483,22 +642,29 @@
 
       function makeObject() {
         const roll = Math.random();
+        const character = characters[selectedIndex] || {};
+        const dislikes = character.dislikes && character.dislikes !== 'Не указано' ? character.dislikes : null;
+        const likes = character.likes && character.likes !== 'Не указано' ? character.likes : null;
+        const choose = list => list[Math.floor(Math.random() * list.length)] || 'Игровой предмет';
         if (roll < .37) {
           const list = ideas.jump_over || defaultIdeas.jump_over;
-          return { kind: 'jump_over', label: list[Math.floor(Math.random() * list.length)] || 'Препятствие', x: W + 24, y: groundY - 28, w: 46, h: 42 };
+          const label = dislikes || choose(list);
+          return { kind: 'jump_over', label, image_path: window.gameItemArt?.obstacles?.[label], x: W + 24, y: groundY - 28, w: 52, h: 52 };
         }
         if (roll < .59) {
           const list = ideas.duck_under || defaultIdeas.duck_under;
-          return { kind: 'duck_under', label: list[Math.floor(Math.random() * list.length)] || 'Препятствие', x: W + 24, y: groundY - 126, w: 58, h: 44 };
+          const label = dislikes || choose(list);
+          return { kind: 'duck_under', label, image_path: window.gameItemArt?.obstacles?.[label], x: W + 24, y: groundY - 126, w: 54, h: 52 };
         }
         if (roll < .96) {
           const list = ideas.energy_pickup || defaultIdeas.energy_pickup;
-          const label = list[Math.floor(Math.random() * list.length)] || 'Бонус';
+          const label = likes || choose(list);
           const emoji = label.includes('нот') ? '🎵' : label.includes('Книж') ? '📘' : label.includes('мяч') ? '⚽' : label.includes('Кот') ? '🐱' : '🍕';
-          return { kind: 'energy_pickup', label, emoji, x: W + 24, y: groundY - 112 - Math.random() * 42, w: 40, h: 40 };
+          return { kind: 'energy_pickup', label, emoji, image_path: window.gameItemArt?.collectibles?.[label], x: W + 24, y: groundY - 112 - Math.random() * 42, w: 48, h: 48 };
         }
         const list = ideas.temporary_growth_pickup || defaultIdeas.temporary_growth_pickup;
-        return { kind: 'temporary_growth_pickup', label: list[0] || 'Большая радость', emoji: '☀️', x: W + 24, y: groundY - 158, w: 44, h: 44 };
+        const label = likes || list[0] || 'Большая радость';
+        return { kind: 'temporary_growth_pickup', label, emoji: '☀️', image_path: window.gameItemArt?.collectibles?.[label], x: W + 24, y: groundY - 158, w: 48, h: 48 };
       }
 
       function jump() {
@@ -524,9 +690,9 @@
         if (object.kind === 'jump_over' && jumpHeight > 30) return;
         if (object.kind === 'duck_under' && ducking) return;
         object.done = true;
-        energy -= 18;
+        energy = 0;
         flashUntil = now + 380;
-        if (energy <= 0) endRun();
+        endRun(`Столкновение с препятствием «${object.label}» завершило забег.`);
       }
 
       function loop(now) {
@@ -558,6 +724,9 @@
 
       startButton.addEventListener('click', startRun);
       restartButton.addEventListener('click', startRun);
+      document.querySelectorAll('input[name="background"]').forEach(input => {
+        input.addEventListener('change', () => { backgroundTheme = input.value; paint(); });
+      });
       document.getElementById('jumpButton').addEventListener('pointerdown', event => { event.preventDefault(); jump(); });
       const duckButton = document.getElementById('duckButton');
       duckButton.addEventListener('pointerdown', event => { event.preventDefault(); ducking = true; });
@@ -583,7 +752,7 @@
         drawRoster(); renderIdeas(); paint();
       }
 
-      spriteSheet.addEventListener('load', () => { if (characters.length) { drawRoster(); paint(); } });
+      spriteSheet.addEventListener('load', () => { prepareCharacterCutouts(); drawRoster(); paint(); });
       spriteSheet.addEventListener('error', () => {
         document.getElementById('dataNotice').hidden = false;
       });
