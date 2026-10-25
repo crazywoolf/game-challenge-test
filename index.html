@@ -1,146 +1,594 @@
 <!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fbf8ee" />
-    <meta name="description" content="Цветной пиксельный раннер с героями, выбранными вместе." />
-    <title>Game Challenge — общий забег</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-    <script src="./game.js" defer></script>
-  </head>
-  <body>
-    <main class="page-shell">
-      <header class="topbar">
-        <a class="brand" href="#top" aria-label="Game Challenge, начало страницы">
-          <span class="brand-mark" aria-hidden="true">G</span>
-          <span>GAME <span class="brand-light">CHALLENGE</span></span>
-        </a>
-        <span class="build-tag"><span class="live-dot"></span> ТЕСТОВЫЙ ЗАБЕГ</span>
-      </header>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff7e8">
+  <title>Команда на бегу!</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #24344a;
+      --muted: #64748b;
+      --paper: #fffdf7;
+      --line: #e9dfcd;
+      --orange: #ff914d;
+      --yellow: #ffcf5a;
+      --blue: #5ca8e8;
+      --green: #67bd83;
+      --pink: #f28c9d;
+      font-family: ui-rounded, "Trebuchet MS", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, #fff1c6 0 13rem, transparent 13.1rem),
+        linear-gradient(180deg, #fff8e9, #f4f8ff 48rem, #f5fbf1);
+    }
+    button { font: inherit; }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 42px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 16px; background: var(--yellow); font-size: 26px; box-shadow: 0 4px 0 #e8ad38; }
+    .brand h1 { margin: 0; font-size: clamp(22px, 4vw, 31px); letter-spacing: -.04em; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .pill { padding: 9px 13px; border: 1px solid #f1dba8; border-radius: 999px; background: #fffaf0; color: #886319; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(270px, .85fr); align-items: start; gap: 18px; }
+    .card { border: 1px solid rgba(208, 195, 171, .65); border-radius: 22px; background: rgba(255, 253, 247, .94); box-shadow: 0 12px 34px rgba(76, 91, 117, .09); overflow: hidden; }
+    .game-card { padding: 16px; }
+    .game-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 2px 14px; }
+    .game-head h2 { margin: 0; font-size: 18px; }
+    .stats { display: flex; gap: 8px; }
+    .stat { min-width: 88px; padding: 8px 12px; border: 1px solid #e8e2d5; border-radius: 14px; background: #fff; text-align: center; }
+    .stat span { display: block; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .stat strong { font-size: 17px; }
+    #energyValue { color: #d98625; }
+    .canvas-wrap { position: relative; overflow: hidden; border: 2px solid #d7e4e9; border-radius: 17px; background: #bde7ff; }
+    #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 8 / 3; }
+    .game-overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; background: rgba(255, 250, 235, .82); backdrop-filter: blur(3px); }
+    .game-overlay[hidden] { display: none; }
+    .overlay-box { max-width: 440px; }
+    .overlay-emoji { font-size: 38px; line-height: 1; }
+    .overlay-box h3 { margin: 8px 0 4px; font-size: clamp(20px, 3vw, 27px); }
+    .overlay-box p { margin: 0 0 14px; color: #52657b; font-size: 14px; }
+    .button { border: 0; border-radius: 14px; padding: 12px 18px; color: #fff; background: #e97837; box-shadow: 0 4px 0 #bd5927; font-weight: 900; cursor: pointer; transition: transform .12s, filter .12s; }
+    .button:hover { filter: brightness(1.05); transform: translateY(-1px); }
+    .button:active { transform: translateY(2px); box-shadow: 0 2px 0 #bd5927; }
+    .button:focus-visible, .character-option:focus-visible, .mobile-control:focus-visible { outline: 3px solid #376cb0; outline-offset: 3px; }
+    .controls-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 12px; }
+    .keys-hint { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .keys-hint kbd { display: inline-block; min-width: 23px; padding: 2px 5px; border: 1px solid #d5dbe2; border-radius: 6px; background: #fff; color: #34465d; font: inherit; font-weight: 900; text-align: center; }
+    .mobile-controls { display: none; gap: 10px; padding-top: 12px; }
+    .mobile-control { flex: 1; min-height: 52px; border: 0; border-radius: 15px; color: #fff; font-weight: 900; touch-action: none; }
+    .mobile-control.jump { background: var(--blue); box-shadow: 0 4px #347cb7; }
+    .mobile-control.duck { background: var(--green); box-shadow: 0 4px #40885a; }
+    .side { display: grid; gap: 16px; }
+    .panel { padding: 16px; }
+    .panel-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 11px; }
+    .panel-title h2 { margin: 0; font-size: 17px; }
+    .count { display: inline-grid; place-items: center; min-width: 28px; height: 24px; border-radius: 999px; background: #edf4ff; color: #386b9a; font-size: 12px; font-weight: 900; }
+    .selected-label { color: var(--muted); font-size: 12px; }
+    .profile-card { display: grid; gap: 9px; margin: 9px 0 12px; padding: 11px; border: 1px solid #f0e5d2; border-radius: 14px; background: #fffaf1; }
+    .profile-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .profile-heading h3 { margin: 0; font-size: 18px; }
+    .profile-heading span { color: var(--muted); font-size: 10px; font-weight: 800; }
+    .trait-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .trait { min-width: 0; padding: 8px; border-radius: 11px; background: #fff; }
+    .trait strong { display: block; margin-bottom: 3px; font-size: 10px; }
+    .trait p { margin: 0; color: #56657a; font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+    .trait.like strong { color: #3d9660; }
+    .trait.dislike strong { color: #cc6e58; }
+    .profile-feature { margin: 0; padding: 7px 8px; border-radius: 10px; background: #edf4ff; color: #52657b; font-size: 10px; line-height: 1.4; }
+    .roster { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-height: 330px; overflow: auto; padding: 2px 3px 5px 2px; scrollbar-color: #d0dcea transparent; }
+    .character-option { min-width: 0; padding: 5px; border: 2px solid transparent; border-radius: 13px; background: #f5f7f9; color: var(--ink); text-align: center; cursor: pointer; }
+    .character-option:hover { background: #edf5ff; }
+    .character-option.selected { border-color: #e77c3e; background: #fff1dd; box-shadow: 0 2px 0 #f1c78e; }
+    .character-option canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 9px; }
+    .character-option span { display: block; overflow: hidden; margin-top: 4px; font-size: 10px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+    .character-option small { display: block; margin-top: 2px; color: #788494; font-size: 8px; line-height: 1; }
+    .notice { margin: 11px 0 0; color: #6d7280; font-size: 11px; line-height: 1.45; }
+    .idea-card { padding: 14px 15px; }
+    .idea-card h2 { margin: 0 0 10px; font-size: 16px; }
+    .draft-note { margin: 0 0 11px; padding: 9px 10px; border-radius: 11px; background: #fff3d8; color: #76551a; font-size: 11px; line-height: 1.4; }
+    .idea-group { display: grid; grid-template-columns: 25px 1fr; gap: 8px; padding: 7px 0; border-top: 1px solid #f0ede6; }
+    .idea-icon { font-size: 18px; }
+    .idea-group strong { display: block; margin-bottom: 3px; font-size: 11px; }
+    .idea-group p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .footer { padding: 14px 4px 0; color: #768294; font-size: 11px; text-align: center; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { grid-template-columns: 1fr 1fr; align-items: start; }
+      .roster { max-height: 290px; }
+    }
+    @media (max-width: 560px) {
+      .page { width: min(100% - 18px, 520px); padding-top: 12px; }
+      .topbar { align-items: flex-start; }
+      .brand-mark { width: 40px; height: 40px; border-radius: 13px; font-size: 22px; }
+      .brand p { font-size: 11px; }
+      .pill { padding: 7px 9px; font-size: 10px; }
+      .layout { gap: 12px; }
+      .game-card { padding: 10px; border-radius: 18px; }
+      .game-head { align-items: flex-start; }
+      .game-head h2 { max-width: 94px; padding-top: 5px; font-size: 14px; }
+      .stat { min-width: 65px; padding: 6px 8px; }
+      .stat strong { font-size: 15px; }
+      .stat span { font-size: 9px; }
+      .controls-row { align-items: flex-start; }
+      .keys-hint { font-size: 10px; }
+      .mobile-controls { display: flex; }
+      .side { grid-template-columns: 1fr; gap: 12px; }
+      .panel { padding: 12px; }
+      .roster { grid-template-columns: repeat(5, minmax(0, 1fr)); max-height: 250px; gap: 6px; }
+      .character-option { padding: 4px; }
+      .character-option span { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🏃</div>
+        <div><h1>Команда на бегу!</h1><p>Весёлый забег идей и хорошего настроения</p></div>
+      </div>
+      <div class="pill">ИГРАЕМ КОМАНДОЙ ✨</div>
+    </header>
 
-      <section class="intro" id="top">
-        <div class="intro-copy">
-          <p class="eyebrow">ОДИН РАННЕР · ВОСЕМЬ ГЕРОЕВ</p>
-          <h1>Собери героя.<br /><span>Рванём вместе.</span></h1>
-          <p class="intro-lede">Выбери персонажа и проверь, сколько продержишься на трассе.</p>
+    <div class="layout">
+      <section class="card game-card" aria-label="Игровое поле">
+        <div class="game-head">
+          <h2>Полоса приключений</h2>
+          <div class="stats" aria-live="polite">
+            <div class="stat"><span>Счёт</span><strong id="scoreValue">0</strong></div>
+            <div class="stat"><span>Энергия</span><strong id="energyValue">💛 60</strong></div>
+          </div>
         </div>
-        <div class="intro-sticker" aria-hidden="true">
-          <span>★</span>
-          <strong>ТВОЙ<br />ЗАБЕГ!</strong>
-          <i>↗</i>
+        <div class="canvas-wrap">
+          <canvas id="gameCanvas" width="960" height="360" aria-label="Раннер: перепрыгивай предметы, пригибайся под препятствиями и собирай бонусы"></canvas>
+          <div class="game-overlay" id="gameOverlay">
+            <div class="overlay-box">
+              <div class="overlay-emoji" id="overlayEmoji">🌈</div>
+              <h3 id="overlayTitle">Готовы к забегу?</h3>
+              <p id="overlayText">Выбери героя и нажми «Начать забег». Собирай радость и береги энергию команды.</p>
+              <button class="button" id="startButton" type="button">Начать забег</button>
+            </div>
+          </div>
+        </div>
+        <div class="controls-row">
+          <div class="keys-hint"><kbd>Пробел</kbd> / <kbd>↑</kbd> прыгнуть · <kbd>↓</kbd> пригнуться<br>Собирай 💛 и ☀️, избегай препятствий.</div>
+          <button class="button" id="restartButton" type="button" hidden>Ещё раз</button>
+        </div>
+        <div class="mobile-controls" aria-label="Сенсорное управление">
+          <button class="mobile-control jump" id="jumpButton" type="button">⬆ Прыжок</button>
+          <button class="mobile-control duck" id="duckButton" type="button">⬇ Пригнуться</button>
         </div>
       </section>
 
-      <section class="picker-section" aria-labelledby="picker-title">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">01 / ВЫБЕРИ СВОЕГО БЕГУНА</p>
-            <h2 id="picker-title">Кто стартует?</h2>
-          </div>
-          <p class="selection-note" id="selection-note">Выбери одного героя</p>
-        </div>
-        <div class="character-grid" id="character-grid" aria-label="Персонажи">
-          <div class="loading-card">Готовим команду…</div>
-        </div>
-      </section>
-
-      <section class="game-section" aria-labelledby="game-title">
-        <div class="section-heading game-heading">
-          <div>
-            <p class="eyebrow">02 / ПОРА НА ТРАССУ</p>
-            <h2 id="game-title">Забег начинается</h2>
-          </div>
-          <div class="scoreboard" aria-live="polite">
-            <div class="score-chip"><span>СЧЁТ</span><strong id="score">0000</strong></div>
-            <div class="score-chip best-chip"><span>РЕКОРД</span><strong id="best-score">0000</strong></div>
-          </div>
-        </div>
-
-        <div class="game-frame">
-          <div class="arena" id="arena">
-            <div class="sun" aria-hidden="true"></div>
-            <div class="cloud cloud-one" aria-hidden="true"></div>
-            <div class="cloud cloud-two" aria-hidden="true"></div>
-            <div class="hill hill-back" aria-hidden="true"></div>
-            <div class="hill hill-front" aria-hidden="true"></div>
-            <div class="track-markings" aria-hidden="true"></div>
-
-            <div class="energy-widget">
-              <div class="energy-label"><span>⚡ ЗАПАС СИЛ</span><strong id="energy-value">100%</strong></div>
-              <div class="energy-track"><div class="energy-fill" id="energy-fill"></div></div>
+      <aside class="side">
+        <section class="card panel" aria-labelledby="rosterTitle">
+          <div class="panel-title"><h2 id="rosterTitle">Выбери героя</h2><span class="count" id="characterCount">28</span></div>
+          <div class="profile-card" aria-live="polite">
+            <div class="profile-heading"><h3 id="profileName">Гоша</h3><span id="profileId">Герой 01</span></div>
+            <div class="trait-grid">
+              <div class="trait like"><strong>💚 Нравится</strong><p id="profileLikes">Не указано</p></div>
+              <div class="trait dislike"><strong>🧡 Не нравится</strong><p id="profileDislikes">Брокколи</p></div>
             </div>
-
-            <div class="runner" id="runner" aria-label="Ваш персонаж">
-              <img id="runner-image" alt="" draggable="false" />
-              <span class="runner-shadow" aria-hidden="true"></span>
-            </div>
-            <div id="objects-layer" class="objects-layer" aria-hidden="true"></div>
-
-            <div class="ground" aria-hidden="true"><span></span></div>
-
-            <div class="arena-overlay" id="start-overlay">
-              <div class="overlay-card">
-                <span class="overlay-icon" aria-hidden="true">🏁</span>
-                <p class="eyebrow">ГОТОВ К СТАРТУ?</p>
-                <h3>Трасса ждёт!</h3>
-                <p>Прыгай через препятствия, пригибайся под навесами и собирай бонусы.</p>
-                <button class="primary-button" id="start-button" type="button" disabled>ЗАПУСТИТЬ ЗАБЕГ <span>→</span></button>
-                <p class="overlay-hint">ПРОБЕЛ или ↑ — прыжок <span>·</span> ↓ — присесть</p>
-              </div>
-            </div>
-
-            <div class="arena-overlay is-hidden" id="game-over-overlay" aria-live="polite">
-              <div class="overlay-card">
-                <span class="overlay-icon" id="result-icon" aria-hidden="true">🏆</span>
-                <p class="eyebrow" id="result-eyebrow">ЗАБЕГ ЗАВЕРШЁН</p>
-                <h3 id="result-title">Крутой забег!</h3>
-                <p id="result-copy">Ты набрал 0 очков.</p>
-                <button class="primary-button" id="restart-button" type="button">ЕЩЁ ОДИН ЗАБЕГ <span>↻</span></button>
-              </div>
-            </div>
-
-            <div class="notice is-hidden" id="notice" role="status"></div>
+            <p class="profile-feature" id="profileFeature" hidden></p>
           </div>
-          <div class="game-footer">
-            <span><i class="control-dot jump-dot"></i>ПРЫГНИ НАД ПРЕПЯТСТВИЕМ</span>
-            <span><i class="control-dot duck-dot"></i>ПРИСЯДЬ ПОД НИЗКИМ</span>
-            <span><i class="control-dot pickup-dot"></i>ЗАБЕРИ БОНУС</span>
-          </div>
-        </div>
+          <div class="roster" id="roster" aria-label="Галерея героев"></div>
+          <p class="notice" id="dataNotice" hidden>Не удалось загрузить файл данных. Игра запущена с тестовым набором героев.</p>
+        </section>
 
-        <div class="touch-controls" aria-label="Управление для сенсорного экрана">
-          <button class="touch-button jump-button" id="jump-button" type="button"><span>↑</span> ПРЫЖОК</button>
-          <button class="touch-button duck-button" id="duck-button" type="button"><span>↓</span> ПРИСЕСТЬ</button>
-        </div>
-      </section>
+        <section class="card idea-card" aria-labelledby="ideasTitle">
+          <h2 id="ideasTitle">Идеи команды</h2>
+          <p class="draft-note" id="draftNote">Это черновые идеи по ответам. Когда появится сводка голосования, замените ими предметы забега.</p>
+          <div id="ideaList"></div>
+        </section>
+      </aside>
+    </div>
+    <p class="footer">Игровые образы вымышленные. Имена и личные истории участников не используются.</p>
+  </main>
 
-      <section class="rules-section" aria-label="Правила игры">
-        <article class="rule-card rule-jump">
-          <span class="rule-icon" aria-hidden="true">📚</span>
-          <div><span class="rule-kicker">ПЕРЕПРЫГИВАЙ</span><strong id="jump-rule">Стопки книг и лужи</strong></div>
-        </article>
-        <article class="rule-card rule-duck">
-          <span class="rule-icon" aria-hidden="true">🌿</span>
-          <div><span class="rule-kicker">ПРИГИБАЙСЯ</span><strong id="duck-rule">Низкие ветки</strong></div>
-        </article>
-        <article class="rule-card rule-energy">
-          <span class="rule-icon" aria-hidden="true">🍕</span>
-          <div><span class="rule-kicker">ВОССТАНОВИ СИЛЫ</span><strong>Собирай вкусные бонусы</strong></div>
-        </article>
-        <article class="rule-card rule-growth">
-          <span class="rule-icon" aria-hidden="true">✨</span>
-          <div><span class="rule-kicker">СТАНЬ БОЛЬШЕ</span><strong>Лови значок роста</strong></div>
-        </article>
-      </section>
+  <script>
+    (() => {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const rosterEl = document.getElementById('roster');
+      const overlay = document.getElementById('gameOverlay');
+      const startButton = document.getElementById('startButton');
+      const restartButton = document.getElementById('restartButton');
+      const scoreValue = document.getElementById('scoreValue');
+      const energyValue = document.getElementById('energyValue');
+      const spriteSheet = new Image();
+      spriteSheet.src = './images/characters/roster.png';
 
-      <footer class="footer">
-        <span>СОБРАНО ИЗ ИДЕЙ КОМАНДЫ <span aria-hidden="true">✳</span></span>
-        <span>GAME CHALLENGE · TEST BUILD 01</span>
-      </footer>
-    </main>
-  </body>
+      const fallbackNames = ['Гоша', 'Сукуна', 'Рая', 'Рак', 'Соня', 'Лия', 'Кристи', 'Алекс', 'Николь', 'Чебурашка', 'Ева', 'Кир', 'Егор', 'Неон', 'Рэйчел', 'Соня', 'Кайро', 'Сандра', 'Лера', 'Дина', 'Антон', 'Вова', 'Василиса', 'Кира', 'Валера', 'Настя', 'Оля Стар'];
+      const fallbackCharacters = fallbackNames.map((name, index) => ({
+        response_id: String(index + 1).padStart(3, '0'),
+        display_name: name,
+        sprite_index: index,
+        appearance: 'Вымышленный игровой герой',
+        likes: 'Не указано',
+        dislikes: 'Не указано'
+      }));
+      const defaultIdeas = {
+        is_draft: true,
+        note: 'Сводка голосования не загружена. Идеи ниже — добрый черновик по ответам; ведущий может заменить их после голосования.',
+        jump_over: ['Стопка школьных заданий', 'Кочан капусты'],
+        duck_under: ['Длинная инструкция', 'Облачко уборки'],
+        energy_pickup: ['Музыкальные ноты', 'Книжка', 'Футбольный мяч', 'Котик', 'Кусочек пиццы'],
+        temporary_growth_pickup: ['Солнечный выходной']
+      };
+
+      let characters = fallbackCharacters;
+      let ideas = defaultIdeas;
+      let selectedIndex = 0;
+      let state = 'ready';
+      let score = 0;
+      let energy = 60;
+      let lastFrame = 0;
+      let elapsed = 0;
+      let spawnIn = 1.3;
+      let objects = [];
+      let clouds = [{ x: 100, y: 54, s: 1 }, { x: 430, y: 94, s: .75 }, { x: 770, y: 48, s: 1.1 }];
+      let jumpHeight = 0;
+      let jumpVelocity = 0;
+      let ducking = false;
+      let growthUntil = 0;
+      let flashUntil = 0;
+      const W = canvas.width;
+      const H = canvas.height;
+      const groundY = 292;
+      const playerX = 150;
+
+      const labels = {
+        jump_over: 'Перепрыгни',
+        duck_under: 'Пригнись',
+        energy_pickup: 'Бонус энергии',
+        temporary_growth_pickup: 'Большая радость'
+      };
+      const ideaIcons = {
+        jump_over: '📚',
+        duck_under: '🌀',
+        energy_pickup: '💛',
+        temporary_growth_pickup: '☀️'
+      };
+
+      function drawCell(target, index, x, y, width, height) {
+        if (!spriteSheet.complete || !spriteSheet.naturalWidth) {
+          target.fillStyle = ['#d9efff', '#ffe7cf', '#dff4d7', '#f9dce4'][index % 4];
+          target.fillRect(x, y, width, height);
+          target.fillStyle = '#45556a';
+          target.font = `${Math.round(height * .58)}px sans-serif`;
+          target.textAlign = 'center';
+          target.textBaseline = 'middle';
+          target.fillText('🙂', x + width / 2, y + height / 2);
+          return;
+        }
+        const cellW = spriteSheet.naturalWidth / 4;
+        const cellH = spriteSheet.naturalHeight / 7;
+        const col = index % 4;
+        const row = Math.floor(index / 4);
+        target.drawImage(spriteSheet, col * cellW, row * cellH, cellW, cellH, x, y, width, height);
+      }
+
+      function drawRoster() {
+        rosterEl.replaceChildren();
+        characters.forEach((character, index) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `character-option${index === selectedIndex ? ' selected' : ''}`;
+          button.setAttribute('aria-pressed', index === selectedIndex ? 'true' : 'false');
+          button.setAttribute('aria-label', `${character.display_name}. Нравится: ${character.likes || 'не указано'}. Не нравится: ${character.dislikes || 'не указано'}. ${character.appearance || ''}`);
+          const preview = document.createElement('canvas');
+          preview.width = 100;
+          preview.height = 100;
+          preview.setAttribute('aria-hidden', 'true');
+          drawCell(preview.getContext('2d'), Number(character.sprite_index) || 0, 0, 0, 100, 100);
+          const name = document.createElement('span');
+          name.textContent = character.display_name || `Герой ${index + 1}`;
+          const id = document.createElement('small');
+          id.textContent = `№ ${character.response_id || String(index + 1).padStart(3, '0')}`;
+          button.append(preview, name, id);
+          button.addEventListener('click', () => {
+            if (state === 'running') return;
+            selectedIndex = index;
+            drawRoster();
+            updateSelectedProfile();
+            paint();
+          });
+          rosterEl.append(button);
+        });
+        document.getElementById('characterCount').textContent = String(characters.length);
+        updateSelectedProfile();
+      }
+
+      function updateSelectedProfile() {
+        const character = characters[selectedIndex] || fallbackCharacters[0];
+        document.getElementById('profileName').textContent = character.display_name || `Герой ${selectedIndex + 1}`;
+        document.getElementById('profileId').textContent = `Герой ${character.response_id || String(selectedIndex + 1).padStart(3, '0')}`;
+        document.getElementById('profileLikes').textContent = character.likes || 'Не указано';
+        document.getElementById('profileDislikes').textContent = character.dislikes || 'Не указано';
+        const feature = document.getElementById('profileFeature');
+        feature.hidden = !character.feature;
+        feature.textContent = character.feature ? `✨ Фишка: ${character.feature}` : '';
+      }
+
+      function renderIdeas() {
+        const wrapper = document.getElementById('ideaList');
+        wrapper.replaceChildren();
+        const order = ['jump_over', 'duck_under', 'energy_pickup', 'temporary_growth_pickup'];
+        for (const key of order) {
+          const row = document.createElement('div');
+          row.className = 'idea-group';
+          const icon = document.createElement('div');
+          icon.className = 'idea-icon';
+          icon.textContent = ideaIcons[key];
+          const text = document.createElement('div');
+          const heading = document.createElement('strong');
+          heading.textContent = labels[key];
+          const content = document.createElement('p');
+          content.textContent = (ideas[key] || []).join(' · ') || 'Пока нет идей';
+          text.append(heading, content);
+          row.append(icon, text);
+          wrapper.append(row);
+        }
+        document.getElementById('draftNote').textContent = ideas.note || defaultIdeas.note;
+      }
+
+      function roundedRect(x, y, w, h, r, fill) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, r);
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+
+      function drawCloud(x, y, scale) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = 'rgba(255,255,255,.78)';
+        ctx.beginPath();
+        ctx.arc(0, 8, 16, 0, Math.PI * 2);
+        ctx.arc(18, 0, 21, 0, Math.PI * 2);
+        ctx.arc(40, 9, 15, 0, Math.PI * 2);
+        ctx.rect(-1, 8, 43, 16);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawBackground(dt) {
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#9cdbff');
+        sky.addColorStop(.68, '#e4f5ff');
+        sky.addColorStop(1, '#f6f4db');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#ffe27a';
+        ctx.beginPath();
+        ctx.arc(815, 78, 35, 0, Math.PI * 2);
+        ctx.fill();
+        clouds.forEach(cloud => {
+          if (state === 'running') cloud.x -= dt * (18 + cloud.s * 10);
+          if (cloud.x < -70) cloud.x = W + 45;
+          drawCloud(cloud.x, cloud.y, cloud.s);
+        });
+        ctx.fillStyle = '#b6e6bf';
+        ctx.beginPath();
+        ctx.moveTo(0, 240);
+        for (let x = 0; x <= W; x += 80) ctx.quadraticCurveTo(x + 35, 195 + Math.sin(x * .016 + elapsed) * 11, x + 80, 240);
+        ctx.lineTo(W, groundY + 18); ctx.lineTo(0, groundY + 18); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#8bcf9d';
+        ctx.fillRect(0, groundY, W, H - groundY);
+        ctx.fillStyle = '#6fb880';
+        ctx.fillRect(0, groundY, W, 9);
+        for (let x = -((elapsed * 150) % 65); x < W; x += 65) {
+          ctx.fillStyle = 'rgba(255,255,255,.36)';
+          ctx.fillRect(x, groundY + 28, 34, 4);
+          ctx.fillRect(x + 24, groundY + 54, 19, 3);
+        }
+        // Small flowers add landmarks without distracting from the run.
+        for (let x = 34; x < W; x += 112) {
+          const fx = (x - (elapsed * 90) % 112 + 112) % W;
+          ctx.fillStyle = '#fff5b8'; ctx.beginPath(); ctx.arc(fx, groundY + 82, 4, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#ef8290'; ctx.beginPath(); ctx.arc(fx + 5, groundY + 92, 3, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      function drawPlayer(now) {
+        const activeGrowth = now < growthUntil;
+        const scale = activeGrowth ? 1.32 : 1;
+        const bob = state === 'running' && jumpHeight === 0 && !ducking ? Math.sin(elapsed * 13) * 2 : 0;
+        const width = (ducking ? 78 : 70) * scale;
+        const height = (ducking ? 57 : 78) * scale;
+        const y = groundY - height - jumpHeight + bob;
+        ctx.save();
+        if (now < flashUntil) ctx.globalAlpha = .48 + Math.sin(now / 40) * .3;
+        // The generated roster is a sheet of seven rows and four columns.
+        drawCell(ctx, Number(characters[selectedIndex]?.sprite_index) || selectedIndex, playerX, y, width, height);
+        if (activeGrowth) {
+          ctx.font = '24px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText('✨', playerX + width / 2, y - 4);
+        }
+        ctx.restore();
+      }
+
+      function drawObject(object) {
+        ctx.save();
+        if (object.kind === 'jump_over') {
+          const emoji = object.label.includes('капуст') ? '🥬' : '📚';
+          ctx.font = '35px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(emoji, object.x + 23, groundY - 22);
+          roundedRect(object.x + 1, groundY - 5, 44, 6, 3, '#745a43');
+        } else if (object.kind === 'duck_under') {
+          ctx.strokeStyle = '#8f744f'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(object.x + 8, groundY - 118); ctx.lineTo(object.x + 8, groundY - 82); ctx.moveTo(object.x + 44, groundY - 118); ctx.lineTo(object.x + 44, groundY - 82); ctx.stroke();
+          roundedRect(object.x, groundY - 126, 58, 35, 10, '#ffad68');
+          ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(object.label.includes('инструкц') ? '📣' : '🧹', object.x + 29, groundY - 109);
+        } else {
+          const emoji = object.kind === 'temporary_growth_pickup' ? '☀️' : object.emoji;
+          ctx.save();
+          ctx.translate(object.x + 20, object.y + Math.sin(elapsed * 6 + object.x) * 4);
+          ctx.rotate(Math.sin(elapsed * 3 + object.x) * .1);
+          ctx.beginPath(); ctx.arc(0, 0, object.kind === 'temporary_growth_pickup' ? 24 : 21, 0, Math.PI * 2);
+          ctx.fillStyle = object.kind === 'temporary_growth_pickup' ? '#ffe680' : '#fff1a6'; ctx.fill();
+          ctx.font = '25px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(emoji, 0, 1);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function paint(now = performance.now(), dt = 0) {
+        drawBackground(dt);
+        objects.forEach(drawObject);
+        drawPlayer(now);
+        if (state === 'running') {
+          ctx.fillStyle = 'rgba(255,255,255,.72)';
+          roundedRect(18, 16, 132, 34, 12, 'rgba(255,255,255,.72)');
+          ctx.fillStyle = '#40516b'; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+          ctx.fillText('Беги к радости!', 30, 33);
+        }
+      }
+
+      function updateStats() {
+        scoreValue.textContent = Math.floor(score).toString();
+        energyValue.textContent = `💛 ${Math.max(0, Math.ceil(energy))}`;
+      }
+
+      function startRun() {
+        state = 'running'; score = 0; energy = 60; elapsed = 0; spawnIn = .9; objects = [];
+        jumpHeight = 0; jumpVelocity = 0; ducking = false; growthUntil = 0; flashUntil = 0;
+        lastFrame = performance.now();
+        overlay.hidden = true; restartButton.hidden = true;
+        updateStats();
+        requestAnimationFrame(loop);
+      }
+
+      function endRun() {
+        state = 'over';
+        overlay.hidden = false;
+        document.getElementById('overlayEmoji').textContent = '🌟';
+        document.getElementById('overlayTitle').textContent = 'Отличный забег!';
+        document.getElementById('overlayText').textContent = `Счёт: ${Math.floor(score)}. Команда собрала много хорошего настроения — можно попробовать ещё раз.`;
+        startButton.textContent = 'Сыграть снова';
+        restartButton.hidden = false;
+        paint();
+      }
+
+      function makeObject() {
+        const roll = Math.random();
+        if (roll < .37) {
+          const list = ideas.jump_over || defaultIdeas.jump_over;
+          return { kind: 'jump_over', label: list[Math.floor(Math.random() * list.length)] || 'Препятствие', x: W + 24, y: groundY - 28, w: 46, h: 42 };
+        }
+        if (roll < .59) {
+          const list = ideas.duck_under || defaultIdeas.duck_under;
+          return { kind: 'duck_under', label: list[Math.floor(Math.random() * list.length)] || 'Препятствие', x: W + 24, y: groundY - 126, w: 58, h: 44 };
+        }
+        if (roll < .96) {
+          const list = ideas.energy_pickup || defaultIdeas.energy_pickup;
+          const label = list[Math.floor(Math.random() * list.length)] || 'Бонус';
+          const emoji = label.includes('нот') ? '🎵' : label.includes('Книж') ? '📘' : label.includes('мяч') ? '⚽' : label.includes('Кот') ? '🐱' : '🍕';
+          return { kind: 'energy_pickup', label, emoji, x: W + 24, y: groundY - 112 - Math.random() * 42, w: 40, h: 40 };
+        }
+        const list = ideas.temporary_growth_pickup || defaultIdeas.temporary_growth_pickup;
+        return { kind: 'temporary_growth_pickup', label: list[0] || 'Большая радость', emoji: '☀️', x: W + 24, y: groundY - 158, w: 44, h: 44 };
+      }
+
+      function jump() {
+        if (state === 'running' && jumpHeight <= 0) {
+          ducking = false;
+          jumpVelocity = 585;
+        }
+      }
+
+      function hitObject(object, now) {
+        if (object.kind === 'energy_pickup') {
+          energy = Math.min(100, energy + 12);
+          object.done = true;
+          flashUntil = now + 130;
+          return;
+        }
+        if (object.kind === 'temporary_growth_pickup') {
+          growthUntil = now + 5500;
+          energy = Math.min(100, energy + 8);
+          object.done = true;
+          return;
+        }
+        if (object.kind === 'jump_over' && jumpHeight > 30) return;
+        if (object.kind === 'duck_under' && ducking) return;
+        object.done = true;
+        energy -= 18;
+        flashUntil = now + 380;
+        if (energy <= 0) endRun();
+      }
+
+      function loop(now) {
+        if (state !== 'running') return;
+        const dt = Math.min(.035, Math.max(0, (now - lastFrame) / 1000));
+        lastFrame = now; elapsed += dt;
+        score += dt * 12;
+        const speed = Math.min(520, 290 + elapsed * 4);
+        if (jumpVelocity > 0 || jumpHeight > 0) {
+          jumpHeight += jumpVelocity * dt;
+          jumpVelocity -= 1450 * dt;
+          if (jumpHeight < 0) { jumpHeight = 0; jumpVelocity = 0; }
+        }
+        spawnIn -= dt;
+        if (spawnIn <= 0) {
+          objects.push(makeObject());
+          spawnIn = Math.max(.9, 1.48 - elapsed * .006) + Math.random() * .55;
+        }
+        for (const object of objects) {
+          object.x -= speed * dt;
+          const overlap = object.x < playerX + 64 && object.x + object.w > playerX + 9;
+          if (overlap && !object.done) hitObject(object, now);
+        }
+        objects = objects.filter(object => object.x > -90 && !object.done);
+        updateStats();
+        paint(now, dt);
+        if (state === 'running') requestAnimationFrame(loop);
+      }
+
+      startButton.addEventListener('click', startRun);
+      restartButton.addEventListener('click', startRun);
+      document.getElementById('jumpButton').addEventListener('pointerdown', event => { event.preventDefault(); jump(); });
+      const duckButton = document.getElementById('duckButton');
+      duckButton.addEventListener('pointerdown', event => { event.preventDefault(); ducking = true; });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => duckButton.addEventListener(type, () => { ducking = false; }));
+      window.addEventListener('keydown', event => {
+        if (['Space', 'ArrowUp', 'ArrowDown'].includes(event.code)) event.preventDefault();
+        if (event.code === 'Space' || event.code === 'ArrowUp') jump();
+        if (event.code === 'ArrowDown') ducking = true;
+      });
+      window.addEventListener('keyup', event => { if (event.code === 'ArrowDown') ducking = false; });
+      window.addEventListener('blur', () => { ducking = false; });
+
+      async function loadData() {
+        try {
+          const response = await fetch('./mock-character-data.json');
+          if (!response.ok) throw new Error('Data file not found');
+          const data = await response.json();
+          if (Array.isArray(data.characters) && data.characters.length) characters = data.characters;
+          if (data.mock_vote_summary) ideas = data.mock_vote_summary;
+        } catch (_) {
+          document.getElementById('dataNotice').hidden = false;
+        }
+        drawRoster(); renderIdeas(); paint();
+      }
+
+      spriteSheet.addEventListener('load', () => { if (characters.length) { drawRoster(); paint(); } });
+      spriteSheet.addEventListener('error', () => {
+        document.getElementById('dataNotice').hidden = false;
+      });
+      drawRoster(); renderIdeas(); paint(); loadData();
+    })();
+  </script>
+</body>
 </html>
